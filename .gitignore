@@ -1,0 +1,8 @@
+.vscode/
+expts/
+hw4_data/hw4p1_data.tar
+.IDL-HW4.tar
+wandb/
+hw4_data/
+hw4_data_subset/
+*.pyc
