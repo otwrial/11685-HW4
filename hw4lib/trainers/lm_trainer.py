@@ -86,7 +86,7 @@ class LMTrainer(BaseTrainer):
             targets_shifted, targets_golden, lengths = batch
             targets_shifted = targets_shifted.to(self.device)
             targets_golden = targets_golden.to(self.device)
-        
+            lengths = lengths.to(self.device)
 
             with torch.autocast(device_type=self.device, dtype=torch.float16):
 
@@ -412,6 +412,7 @@ class LMTrainer(BaseTrainer):
             else:
                 # TODO: Use the prompts and the generate_greedy method you implemented in the SequenceGenerator class to generate sequences
                 print("Generating with greedy search...")
+                # prompt = 
                 seqs, scores = generator.generate_greedy(
                     prompts,
                     temperature=generation_config.get('temperature', 1.0),

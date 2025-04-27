@@ -154,7 +154,7 @@ class DecoderOnlyTransformer(nn.Module):
             raise ValueError("target_lengths must be provided during training")
         
         # TODO: Implement forward
-
+        batch, seq_len = padded_targets.shape
         # TODO: Create padding mask for padded_targets on the same device as the input (use PadMask)
         pad_mask_dec = None
         if target_lengths is not None:
@@ -166,7 +166,8 @@ class DecoderOnlyTransformer(nn.Module):
         # TODO: Apply the embedding
         x = self.target_embedding(padded_targets) # Target embedding
         # TODO: Apply positional encoding
-        x = self.positional_encoding(padded_targets) # Positional encoding
+        pos_ids   = torch.arange(seq_len, device=padded_targets.device).expand(batch, seq_len)
+        x = self.positional_encoding(pos_ids) + x# Positional encoding
         # TODO: Apply dropout 
         x = self.dropout(x) # Dropout
 
