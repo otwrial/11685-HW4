@@ -253,7 +253,7 @@ class ASRDataset(Dataset):
                 - golden_transcript: LongTensor  (time) or None
         """
         # TODO: Load features
-        feat = torch.FloatTensor(np.load(os.path.join(self.fbank_dir, self.fbank_files[idx]))) # (num_feats, time)
+        feat = torch.FloatTensor(self.feats[idx]) # (num_feats, time)
 
         # TODO: Apply normalization
         if self.config['norm'] == 'global_mvn':
