@@ -58,6 +58,7 @@ class ASRTrainer(BaseTrainer):
         super().__init__(model, tokenizer, config, run_name, config_file, device)
 
         # TODO: Implement the __init__ method
+        self.scaler = torch.cuda.amp.GradScaler()
         
         # TODO: Initialize CE loss
         # How would you set the ignore_index? 
@@ -155,7 +156,6 @@ class ASRTrainer(BaseTrainer):
             loss = loss / self.config['training']['gradient_accumulation_steps']
 
             # TODO: Backpropagate the loss
-            self.scaler = torch.cuda.amp.GradScaler()
             self.scaler.scale(loss).backward()
 
             # Only update weights after accumulating enough gradients
