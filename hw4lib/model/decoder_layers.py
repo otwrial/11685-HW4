@@ -149,8 +149,8 @@ class CrossAttentionDecoderLayer(nn.Module):
         # TODO: Implement forward: Follow the figure in the writeup
         residual = x
         x_norm = self.norm1(x)
-        x, self_attn_weights  = self.self_attn(
-            x=x,
+        x_attn, self_attn_weights  = self.self_attn(
+            x=x_norm,
             key_padding_mask=dec_key_padding_mask,
             attn_mask=attn_mask,
         )
@@ -158,8 +158,8 @@ class CrossAttentionDecoderLayer(nn.Module):
 
         residual = x
         x_norm = self.norm2(x)
-        x, cross_attn_weights = self.cross_attn(
-            x=x,
+        x_cross, cross_attn_weights = self.cross_attn(
+            x=x_norm,
             y=enc_output,
             key_padding_mask=enc_key_padding_mask,
         )
@@ -169,7 +169,7 @@ class CrossAttentionDecoderLayer(nn.Module):
         # TODO: Return the output tensor and attention weights    
         residual = x
         x_norm = self.norm3(x)
-        x_ff = self.ffn(x)
+        x_ff = self.ffn(x_norm)
         output = residual + self.drop3(x_ff)
         return output, self_attn_weights, cross_attn_weights
 ## -------------------------------------------------------------------------------------------------    
