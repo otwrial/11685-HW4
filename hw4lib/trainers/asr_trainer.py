@@ -123,8 +123,9 @@ class ASRTrainer(BaseTrainer):
                 running_att = curr_att
                 
                 # TODO: Calculate CE loss
+                logits = seq_out.permute(0, 2, 1)
                 ce_loss = self.ce_criterion(
-                    input=seq_out,
+                    input=logits,
                     target=targets_golden,
                 )
                 
@@ -132,10 +133,10 @@ class ASRTrainer(BaseTrainer):
                 # TODO: Calculate CTC loss if needed
                 if self.ctc_weight > 0:
                     ctc_loss = self.ctc_criterion(
-                        input=ctc_inputs,
-                        input_lengths=feat_lengths,
-                        targets=targets_golden,
-                        target_lengths=transcript_lengths,
+                        ctc_inputs["log_probs"],
+                        targets_golden,
+                        ctc_inputs["lengths"],
+                        transcript_lengths,
                     )
                     loss = ce_loss + self.ctc_weight * ctc_loss
                 else:
@@ -154,7 +155,8 @@ class ASRTrainer(BaseTrainer):
             loss = loss / self.config['training']['gradient_accumulation_steps']
 
             # TODO: Backpropagate the loss
-            self.scaler = torch.cuda.amp.cuda.GradScaler()
+            self.scaler = torch.cuda.amp.GradScaler()
+            self.scaler.scale(loss).backward()
 
             # Only update weights after accumulating enough gradients
             if (i + 1) % self.config['training']['gradient_accumulation_steps'] == 0:
