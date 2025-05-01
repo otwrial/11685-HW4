@@ -280,16 +280,17 @@ trainer.train(train_loader, val_loader, epochs=config['training']['epochs'])
 # Define the recognition config: Greedy search
 recognition_config = {
     'num_batches': None,
-    'temperature': 1.0,
-    'repeat_penalty': 1.0,
+    'temperature': config['inference']['temperature'],
+    'repeat_penalty': config['inference']['repeat_penalty'],
     'lm_weight': None,
     'lm_model': None,
-    'beam_width': 1, # Beam width of 1 reverts to greedy
+    'beam_width': config['inference']['beam_width'], # Beam width of 1 reverts to greedy
 }
 
 # Recognize with the shallow fusion config
 config_name = "test"
 print(f"Evaluating with {config_name} config")
+print(f"Recognition config: {recognition_config}")
 results = trainer.recognize(test_loader, recognition_config, config_name=config_name, max_length=max_transcript_len)
 
 
