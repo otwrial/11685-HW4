@@ -121,16 +121,6 @@ class CrossAttentionDecoderLayer(nn.Module):
             d_ff=d_ff,
             dropout=dropout,
         ) # Feed-forward network
-        
-        # pre-LN LayerNorms
-        self.norm1 = nn.LayerNorm(d_model)
-        self.norm2 = nn.LayerNorm(d_model)
-        self.norm3 = nn.LayerNorm(d_model)
-
-        # dropout after each sublayer
-        self.drop1 = nn.Dropout(dropout)
-        self.drop2 = nn.Dropout(dropout)
-        self.drop3 = nn.Dropout(dropout)
 
     def forward(self, x: torch.Tensor, enc_output: torch.Tensor, dec_key_padding_mask: Optional[torch.Tensor] = None, enc_key_padding_mask: Optional[torch.Tensor] = None, attn_mask: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         '''
@@ -147,29 +137,19 @@ class CrossAttentionDecoderLayer(nn.Module):
             cross_attn_weights (torch.Tensor): The attention weights. shape: (batch_size, seq_len, seq_len)    
         '''
         # TODO: Implement forward: Follow the figure in the writeup
-        residual = x
-        x_norm = self.norm1(x)
-        x_attn, self_attn_weights  = self.self_attn(
-            x=x_norm,
+
+        x, self_attn_weights  = self.self_attn(
+            x=x,
             key_padding_mask=dec_key_padding_mask,
             attn_mask=attn_mask,
         )
-        x = residual + self.drop1(x_attn)
-
-        residual = x
-        x_norm = self.norm2(x)
-        x_cross, cross_attn_weights = self.cross_attn(
-            x=x_norm,
+        x, cross_attn_weights = self.cross_attn(
+            x=x,
             y=enc_output,
             key_padding_mask=enc_key_padding_mask,
         )
-        x = residual + self.drop2(x_cross)
-
 
         # TODO: Return the output tensor and attention weights    
-        residual = x
-        x_norm = self.norm3(x)
-        x_ff = self.ffn(x_norm)
-        output = residual + self.drop3(x_ff)
+        output = self.ffn(x)
         return output, self_attn_weights, cross_attn_weights
 ## -------------------------------------------------------------------------------------------------    

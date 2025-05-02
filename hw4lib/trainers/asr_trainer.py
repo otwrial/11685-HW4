@@ -157,6 +157,8 @@ class ASRTrainer(BaseTrainer):
 
             # TODO: Backpropagate the loss
             self.scaler.scale(loss).backward()
+            self.scaler.step(self.optimizer)
+            self.scaler.update()
 
             # Only update weights after accumulating enough gradients
             if (i + 1) % self.config['training']['gradient_accumulation_steps'] == 0:
